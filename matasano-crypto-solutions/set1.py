@@ -2,7 +2,7 @@ from base64 import b64encode
 from binascii import hexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
-from typing import Dict
+from typing import Dict, Iterable
 from pathlib import Path
 import os
 
@@ -54,7 +54,7 @@ def xor(x: str, y: str):
     return hexlify(bytes((a ^ b for a, b in zip(x, y))))
 
 
-def find_english_text(texts: list):
+def find_english_text(texts: Iterable):
     scores = defaultdict(list)
     for text in texts:
         score = 0
