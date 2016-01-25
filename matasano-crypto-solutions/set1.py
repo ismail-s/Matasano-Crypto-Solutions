@@ -30,14 +30,15 @@ def get_most_common_from_counter(counter: Counter, n: int):
         return []
     elems = counter.most_common()
     # nums holds all the nums we have seen so far, including duplicates
-    nums = [elems[0][1]]
-    i = 1
+    last_num = elems[0][1]
+    total_nums_so_far = i = 1
     for elem, num in elems[1:]:
-        if len(nums) >= n and num < nums[-1]:
+        if total_nums_so_far >= n and num < last_num:
             break
         # we either haven't got enough nums or we haven't finished collecting
-        # the same num
-        nums.append(num)
+        # elems with the same count
+        last_num = num
+        total_nums_so_far += 1
         i += 1
     return sorted(elems[:i], key=lambda tup: str(
         tup[1]) + tup[0], reverse=True)
