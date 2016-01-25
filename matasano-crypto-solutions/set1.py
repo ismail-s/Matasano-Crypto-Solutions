@@ -58,7 +58,7 @@ def find_english_text(texts: list):
     for text in texts:
         score = 0
         count = Counter(text.lower())
-        most_common = {x for x, _ in count.most_common(5)}
+        most_common = {x for x, _ in get_most_common_from_counter(count, 5)}
         least_common = {x for x, _ in count.most_common()[:-5 - 1:-1]}
         for e in ['e', 't', 'a', 'o']:
             if e in most_common:
