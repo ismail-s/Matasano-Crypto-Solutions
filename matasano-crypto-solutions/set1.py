@@ -12,20 +12,35 @@ current_dir = str(Path(__file__).parent)
 def get_most_common_from_counter(counter: Counter, n: int):
     """Like counter.most_common(n), but includes elements with
     equal counts, which means the returned
-    list may be longer than n."""
+    list may be longer than n. Elements with the same count are ordered in
+    reverse alphabetical order (easier to code), but all elements with a
+    given count will be returned if one is returned.
+
+    >>> get_most_common_from_counter(Counter('test'), 1)
+    [('t', 2)]
+    >>> get_most_common_from_counter(Counter('test'), 2)
+    [('t', 2), ('s', 1), ('e', 1)]
+    >>> get_most_common_from_counter(Counter('test'), 1)
+    [('t', 2)]
+    >>> get_most_common_from_counter(Counter('teest'), 1)
+    [('t', 2), ('e', 2)]
+    >>> get_most_common_from_counter(Counter('teest'), 9)
+    [('t', 2), ('e', 2), ('s', 1)]"""
+    if n < 0:
+        return []
     elems = counter.most_common()
-    count = 1
+    # nums holds all the nums we have seen so far, including duplicates
+    nums = [elems[0][1]]
     i = 1
-    last_seen_elem, last_num = elems[0]
     for elem, num in elems[1:]:
-        if last_num > num:
-            count += 1
-        last_seen_elem = elem
-        last_num = num
-        i += 1
-        if count == n:
+        if len(nums) >= n and num < nums[-1]:
             break
-    return elems[:i]
+        # we either haven't got enough nums or we haven't finished collecting
+        # the same num
+        nums.append(num)
+        i += 1
+    return sorted(elems[:i], key=lambda tup: str(
+        tup[1]) + tup[0], reverse=True)
 
 
 def hex_to_base64(bstr: str):
