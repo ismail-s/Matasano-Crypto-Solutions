@@ -1,5 +1,5 @@
 from base64 import b64encode
-from binascii import unhexlify, hexlify
+from binascii import hexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
 from typing import Dict
@@ -14,21 +14,24 @@ def get_most_common_from_counter(counter: Counter, n: int):
     last_seen_elem, last_num = elems[0]
     for elem, num in elems[1:]:
         if last_num > num:
-            count +=1
+            count += 1
         last_seen_elem = elem
         last_num = num
-        i +=1
+        i += 1
         if count == n:
             break
     return elems[:i]
 
+
 def hex_to_base64(bstr: str):
     return b64encode(bytes.fromhex(bstr))
+
 
 def xor(x: str, y: str):
     x = bytes.fromhex(x)
     y = bytes.fromhex(y)
-    return hexlify(bytes((a^b for a, b in zip(x, y))))
+    return hexlify(bytes((a ^ b for a, b in zip(x, y))))
+
 
 def find_english_text(texts: list):
     scores = defaultdict(list)
@@ -36,18 +39,18 @@ def find_english_text(texts: list):
         score = 0
         count = Counter(text.lower())
         most_common = {x for x, _ in count.most_common(5)}
-        least_common = {x for x, _ in count.most_common()[:-5-1:-1]}
+        least_common = {x for x, _ in count.most_common()[:-5 - 1:-1]}
         for e in ['e', 't', 'a', 'o']:
             if e in most_common:
-                score +=1
+                score += 1
         for e in ['z', 'q', 'x']:
             if e in least_common or e not in count:
-                score +=1
+                score += 1
         for e in text:
             if e not in ascii_letters:
-                score -=1
+                score -= 1
         if count[' '] < 2:
-            score -=2
+            score -= 2
         scores[score].append(text)
     max_score = max(scores.keys())
     res = scores[max_score]
@@ -60,13 +63,13 @@ def find_english_text(texts: list):
             return ''
     return res[choice]
 
+
 def decode_1_byte_xor(bstr: str):
     x = bytes.fromhex(bstr)
     strings = {}  # type: Dict[bytes, str]
     for e in range(256):
         try:
-            y = bytes((a^e for a in x)).decode('ascii')
-            #print(y, sep=' ')
+            y = bytes((a ^ e for a in x)).decode('ascii')
         except UnicodeDecodeError:
             continue
         strings[y] = chr(e)
@@ -76,6 +79,7 @@ def decode_1_byte_xor(bstr: str):
     if not res:
         return '', ''
     return strings[res], res
+
 
 def find_and_decrypt_ciphertexts(ciphertexts: list):
     plaintexts = {}
@@ -87,10 +91,13 @@ def find_and_decrypt_ciphertexts(ciphertexts: list):
     res = find_english_text(plaintexts.keys())
     return plaintexts[res], res
 
-res1 = hex_to_base64('49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d')
+res1 = hex_to_base64(
+    '49276d206b696c6c696e6720796f757220627261696e206c6'
+    '96b65206120706f69736f6e6f7573206d757368726f6f6d')
 print('Task 1')
 print(res1)
-assert res1 == b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t'
+assert res1 == (b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc'
+                b'29ub3VzIG11c2hyb29t')
 
 print('Task 2')
 x = '1c0111001f010100061a024b53535009181c'
@@ -100,7 +107,8 @@ print(res2)
 assert res2 == b'746865206b696420646f6e277420706c6179'
 
 print('Task 3')
-ciphertext = '1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736'
+ciphertext = ('1b37373331363f78151b7f2b783431333d78397828372d'
+              '363c78373e783a393b3736')
 res3 = decode_1_byte_xor(ciphertext)
 print(res3[1])
 assert res3[1] == "Cooking MC's like a pound of bacon"
