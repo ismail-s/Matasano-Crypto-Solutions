@@ -5,6 +5,7 @@ from string import ascii_letters
 from typing import Dict, Iterable
 from pathlib import Path
 import os
+import itertools
 
 current_dir = str(Path(__file__).parent)
 
@@ -52,6 +53,14 @@ def xor(x: str, y: str):
     x = bytes.fromhex(x)
     y = bytes.fromhex(y)
     return hexlify(bytes((a ^ b for a, b in zip(x, y))))
+
+
+def repeating_key_xor(string: str, key: str) -> str:
+    res = bytearray()
+    repeating_key = itertools.cycle(bytes(key, 'ascii'))
+    for a, b in zip(bytes(string, 'ascii'), repeating_key):
+        res.append(a^b)
+    return hexlify(res).decode('ascii')
 
 
 def find_english_text(texts: Iterable):
@@ -139,3 +148,14 @@ ciphertexts = open(os.path.join(current_dir, '4.txt'), 'r').read().split('\n')
 res4 = find_and_decrypt_ciphertexts(ciphertexts)
 print('Key: {0}\nPlaintext: {1}'.format(*res4))
 assert res4[1] == 'Now that the party is jumping\n'
+
+print('Task 5')
+plaintext = """Burning 'em, if you ain't quick and nimble
+I go crazy when I hear a cymbal"""
+key = "ICE"
+correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c"
+"2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b20276"
+"30c692b20283165286326302e27282f")
+res5 = repeating_key_xor(plaintext, key)
+print(res5)
+assert res5 == correct_answer
