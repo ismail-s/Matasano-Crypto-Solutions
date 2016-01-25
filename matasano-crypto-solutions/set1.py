@@ -3,6 +3,11 @@ from binascii import hexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
 from typing import Dict
+from pathlib import Path
+import os
+
+current_dir = str(Path(__file__).parent)
+
 
 def get_most_common_from_counter(counter: Counter, n: int):
     """Like counter.most_common(n), but includes elements with
@@ -114,6 +119,6 @@ print(res3[1])
 assert res3[1] == "Cooking MC's like a pound of bacon"
 
 print('Task 4')
-ciphertexts = open('4.txt', 'r').read().split('\n')
+ciphertexts = open(os.path.join(current_dir, '4.txt'), 'r').read().split('\n')
 res4 = find_and_decrypt_ciphertexts(ciphertexts)
 print(res4)
