@@ -121,4 +121,5 @@ assert res3[1] == "Cooking MC's like a pound of bacon"
 print('Task 4')
 ciphertexts = open(os.path.join(current_dir, '4.txt'), 'r').read().split('\n')
 res4 = find_and_decrypt_ciphertexts(ciphertexts)
-print(res4)
+print('Key: {0}\nPlaintext: {1}'.format(*res4))
+assert res4[1] == 'Now that the party is jumping\n'
