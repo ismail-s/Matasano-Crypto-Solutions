@@ -121,6 +121,17 @@ def find_and_decrypt_ciphertexts(ciphertexts: list):
     res = find_english_text(plaintexts.keys())
     return plaintexts[res], res
 
+def hamming_distance(string1, string2):
+    res = 0
+    for a, b in zip(string1, string2):
+        # '07b' means add zero padding, make the number be in binary and be
+        # 7 digits long.
+        a, b = map(lambda x: format(ord(x), '07b'), (a, b))
+        assert len(a) == len(b)
+        for A, B in zip(a, b):
+            res += int(A)^int(B)
+    return res
+
 res1 = hex_to_base64(
     '49276d206b696c6c696e6720796f757220627261696e206c6'
     '96b65206120706f69736f6e6f7573206d757368726f6f6d')
@@ -159,3 +170,8 @@ correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c"
 res5 = repeating_key_xor(plaintext, key)
 print(res5)
 assert res5 == correct_answer
+
+print('Task 6')
+string1 = 'this is a test'
+string2 = 'wokka wokka!!!'
+print('Hamming Distance Check:', hamming_distance(string1, string2))
