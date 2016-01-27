@@ -1,11 +1,13 @@
-from base64 import b64encode
-from binascii import hexlify
+from base64 import b64encode, b64decode
+from binascii import hexlify, unhexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
 from typing import Dict, Iterable
 from pathlib import Path
 import os
 import itertools
+from functools import reduce
+
 
 current_dir = str(Path(__file__).parent)
 
@@ -55,11 +57,11 @@ def xor(x: str, y: str):
     return hexlify(bytes((a ^ b for a, b in zip(x, y))))
 
 
-def repeating_key_xor(string: str, key: str) -> str:
+def repeating_key_xor(string: bytes, key: bytes) -> str:
     res = bytearray()
-    repeating_key = itertools.cycle(bytes(key, 'ascii'))
-    for a, b in zip(bytes(string, 'ascii'), repeating_key):
-        res.append(a^b)
+    repeating_key = itertools.cycle(key)
+    for a, b in zip(string, repeating_key):
+        res.append(a ^ b)
     return hexlify(res).decode('ascii')
 
 
@@ -94,8 +96,7 @@ def find_english_text(texts: Iterable):
     return res[choice]
 
 
-def decode_1_byte_xor(bstr: str):
-    x = bytes.fromhex(bstr)
+def decode_1_byte_xor(x: bytes):
     strings = {}  # type: Dict[bytes, str]
     for e in range(256):
         try:
@@ -114,23 +115,70 @@ def decode_1_byte_xor(bstr: str):
 def find_and_decrypt_ciphertexts(ciphertexts: list):
     plaintexts = {}
     for c in ciphertexts:
-        key, string = decode_1_byte_xor(c)
+        key, string = decode_1_byte_xor(bytes.fromhex(c))
         if not key or not string:
             continue
         plaintexts[string] = key
     res = find_english_text(plaintexts.keys())
     return plaintexts[res], res
 
-def hamming_distance(string1, string2):
+
+def hamming_distance(string1: bytes, string2: bytes):
     res = 0
     for a, b in zip(string1, string2):
         # '07b' means add zero padding, make the number be in binary and be
-        # 7 digits long.
-        a, b = map(lambda x: format(ord(x), '07b'), (a, b))
+        # 8 digits long.
+        a, b = map(lambda x: format(x, '08b'), (a, b))
         assert len(a) == len(b)
         for A, B in zip(a, b):
-            res += int(A)^int(B)
+            res += int(A) ^ int(B)
     return res
+
+
+def normalised_hamming_distance(string1: bytes, string2: bytes):
+    assert len(string1) == len(string2)
+    return hamming_distance(string1, string2) / len(string1)
+
+
+def decode_repeating_byte_xor(ciphertext: bytes):
+    c = ciphertext
+    edit_distances = defaultdict(list)
+    for keysize in range(2, 41):
+        k, e = keysize, []
+        e.append(normalised_hamming_distance(c[:k], c[k:k * 2]))
+        e.append(normalised_hamming_distance(c[k * 2:k * 3], c[k * 3:k * 4]))
+        e.append(normalised_hamming_distance(c[k * 3:k * 4], c[k * 4:k * 5]))
+        e.append(normalised_hamming_distance(c[k * 4:k * 5], c[k * 5:k * 6]))
+        edit_distances[sum(e) / 4].append(keysize)
+    likely_keysizes = sorted(edit_distances.items())[:5]
+
+    def reducing_func(x, y):
+        return x + y[1]
+    possible_keysizes = reduce(reducing_func, likely_keysizes, [])
+    keys = []
+    for keysize in possible_keysizes:
+        n = keysize
+        blocks = [ciphertext[i:i + n] for i in range(0, len(ciphertext), n)]
+        if len(blocks[-1]) != n:
+            del blocks[-1]
+        transposed_blocks = zip(*blocks)
+        key = []
+        for block in transposed_blocks:
+            char, _ = decode_1_byte_xor(block)
+            key.append(char)
+        keys.append(''.join(key))
+    keys = [x for x in keys if x]
+    plaintexts = {}
+    for key in keys:
+        plaintexts[
+            unhexlify(
+                repeating_key_xor(
+                    ciphertext,
+                    bytes(
+                        key,
+                        'ascii'))).decode('ascii')] = key
+    plaintext = find_english_text(plaintexts.keys())
+    return plaintexts[plaintext], plaintext
 
 res1 = hex_to_base64(
     '49276d206b696c6c696e6720796f757220627261696e206c6'
@@ -150,7 +198,7 @@ assert res2 == b'746865206b696420646f6e277420706c6179'
 print('Task 3')
 ciphertext = ('1b37373331363f78151b7f2b783431333d78397828372d'
               '363c78373e783a393b3736')
-res3 = decode_1_byte_xor(ciphertext)
+res3 = decode_1_byte_xor(bytes.fromhex(ciphertext))
 print(res3[1])
 assert res3[1] == "Cooking MC's like a pound of bacon"
 
@@ -164,14 +212,21 @@ print('Task 5')
 plaintext = """Burning 'em, if you ain't quick and nimble
 I go crazy when I hear a cymbal"""
 key = "ICE"
-correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c"
-"2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b20276"
-"30c692b20283165286326302e27282f")
-res5 = repeating_key_xor(plaintext, key)
+correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a"
+                  "26226324272765272a282b2f20430a652e2c652a3124333a653e2b20276"
+                  "30c692b20283165286326302e27282f")
+res5 = repeating_key_xor(bytes(plaintext, 'ascii'), bytes(key, 'ascii'))
 print(res5)
 assert res5 == correct_answer
 
 print('Task 6')
-string1 = 'this is a test'
-string2 = 'wokka wokka!!!'
+string1 = b'this is a test'
+string2 = b'wokka wokka!!!'
 print('Hamming Distance Check:', hamming_distance(string1, string2))
+ciphertext6 = open(os.path.join(current_dir, '6.txt'), 'r').read()
+ciphertext6 = b64decode(ciphertext6)
+res6 = decode_repeating_byte_xor(ciphertext6)
+assert res6[0] == 'Terminator X: Bring the noise'
+print('Key:', res6[0])
+print('Plaintext:')
+print(res6[1])
