@@ -206,69 +206,75 @@ def detect_aes_ecb_encrypted_texts(ciphertexts: List[bytes]):
     most_repeats = max(max_repeats.keys())
     return most_repeats, max_repeats[most_repeats]
 
-res1 = hex_to_base64(
-    '49276d206b696c6c696e6720796f757220627261696e206c6'
-    '96b65206120706f69736f6e6f7573206d757368726f6f6d')
-print('Task 1')
-print(res1)
-assert res1 == (b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc'
-                b'29ub3VzIG11c2hyb29t')
 
-print('Task 2')
-x = '1c0111001f010100061a024b53535009181c'
-y = '686974207468652062756c6c277320657965'
-res2 = xor(x, y)
-print(res2)
-assert res2 == b'746865206b696420646f6e277420706c6179'
+def main():
+    res1 = hex_to_base64(
+        '49276d206b696c6c696e6720796f757220627261696e206c6'
+        '96b65206120706f69736f6e6f7573206d757368726f6f6d')
+    print('Task 1')
+    print(res1)
+    assert res1 == (b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc'
+                    b'29ub3VzIG11c2hyb29t')
 
-print('Task 3')
-ciphertext = ('1b37373331363f78151b7f2b783431333d78397828372d'
-              '363c78373e783a393b3736')
-res3 = decode_1_byte_xor(bytes.fromhex(ciphertext))
-print(res3[1])
-assert res3[1] == "Cooking MC's like a pound of bacon"
+    print('Task 2')
+    x = '1c0111001f010100061a024b53535009181c'
+    y = '686974207468652062756c6c277320657965'
+    res2 = xor(x, y)
+    print(res2)
+    assert res2 == b'746865206b696420646f6e277420706c6179'
 
-print('Task 4')
-ciphertexts = get_file('4.txt').split('\n')
-res4 = find_and_decrypt_ciphertexts(ciphertexts)
-print('Key: {0}\nPlaintext: {1}'.format(*res4))
-assert res4[1] == 'Now that the party is jumping\n'
+    print('Task 3')
+    ciphertext = ('1b37373331363f78151b7f2b783431333d78397828372d'
+                  '363c78373e783a393b3736')
+    res3 = decode_1_byte_xor(bytes.fromhex(ciphertext))
+    print(res3[1])
+    assert res3[1] == "Cooking MC's like a pound of bacon"
 
-print('Task 5')
-plaintext = """Burning 'em, if you ain't quick and nimble
-I go crazy when I hear a cymbal"""
-key = "ICE"
-correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a"
-                  "26226324272765272a282b2f20430a652e2c652a3124333a653e2b20276"
-                  "30c692b20283165286326302e27282f")
-res5 = repeating_key_xor(bytes(plaintext, 'ascii'), bytes(key, 'ascii'))
-print(res5)
-assert res5 == correct_answer
+    print('Task 4')
+    ciphertexts = get_file('4.txt').split('\n')
+    res4 = find_and_decrypt_ciphertexts(ciphertexts)
+    print('Key: {0}\nPlaintext: {1}'.format(*res4))
+    assert res4[1] == 'Now that the party is jumping\n'
 
-print('Task 6')
-string1 = b'this is a test'
-string2 = b'wokka wokka!!!'
-print('Hamming Distance Check:', hamming_distance(string1, string2))
-ciphertext6 = get_file('6.txt')
-ciphertext6 = b64decode(ciphertext6)
-res6 = decode_repeating_byte_xor(ciphertext6)
-assert res6[0] == 'Terminator X: Bring the noise'
-print('Key:', res6[0])
-print('Plaintext:')
-print(res6[1])
+    print('Task 5')
+    plaintext = """Burning 'em, if you ain't quick and nimble
+    I go crazy when I hear a cymbal"""
+    key = "ICE"
+    correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343"
+                      "c2a26226324272765272a282b2f20430a652e2c652a3124333a653e"
+                      "2b2027630c692b20283165286326302e27282f")
+    res5 = repeating_key_xor(bytes(plaintext, 'ascii'), bytes(key, 'ascii'))
+    print(res5)
+    assert res5 == correct_answer
 
-print('Task 7')
-ciphertext7 = get_file('7.txt')
-ciphertext7 = b64decode(ciphertext7)
-password = b"YELLOW SUBMARINE"
-res7 = decode_aes_ecb(ciphertext7, password)
-assert res7.startswith("I'm back and I'm ringin' the bell ")
-print(res7)
+    print('Task 6')
+    string1 = b'this is a test'
+    string2 = b'wokka wokka!!!'
+    print('Hamming Distance Check:', hamming_distance(string1, string2))
+    ciphertext6 = get_file('6.txt')
+    ciphertext6 = b64decode(ciphertext6)
+    res6 = decode_repeating_byte_xor(ciphertext6)
+    assert res6[0] == 'Terminator X: Bring the noise'
+    print('Key:', res6[0])
+    print('Plaintext:')
+    print(res6[1])
 
-print('Task 8')
-ciphertexts8 = get_file('8.txt').split('\n')
-ciphertexts8 = [bytes.fromhex(x) for x in ciphertexts8 if x]
-res8 = detect_aes_ecb_encrypted_texts(ciphertexts8)
-assert len(res8[1]) == 1
-print('Most likely string:', hexlify(res8[1][0]).decode('ascii'))
-print('Max no. of repeats of a 16byte chunk found:', res8[0])
+    print('Task 7')
+    ciphertext7 = get_file('7.txt')
+    ciphertext7 = b64decode(ciphertext7)
+    password = b"YELLOW SUBMARINE"
+    res7 = decode_aes_ecb(ciphertext7, password)
+    assert res7.startswith("I'm back and I'm ringin' the bell ")
+    print(res7)
+
+    print('Task 8')
+    ciphertexts8 = get_file('8.txt').split('\n')
+    ciphertexts8 = [bytes.fromhex(x) for x in ciphertexts8 if x]
+    res8 = detect_aes_ecb_encrypted_texts(ciphertexts8)
+    assert len(res8[1]) == 1
+    print('Most likely string:', hexlify(res8[1][0]).decode('ascii'))
+    print('Max no. of repeats of a 16byte chunk found:', res8[0])
+
+
+if __name__ == '__main__':
+    main()
