@@ -237,13 +237,13 @@ def main():
     assert res4[1] == 'Now that the party is jumping\n'
 
     print('Task 5')
-    plaintext = """Burning 'em, if you ain't quick and nimble
-    I go crazy when I hear a cymbal"""
+    plaintext5 = ("Burning 'em, if you ain't quick and nimble\n"
+                  "I go crazy when I hear a cymbal""")
     key = "ICE"
     correct_answer = ("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343"
                       "c2a26226324272765272a282b2f20430a652e2c652a3124333a653e"
                       "2b2027630c692b20283165286326302e27282f")
-    res5 = repeating_key_xor(bytes(plaintext, 'ascii'), bytes(key, 'ascii'))
+    res5 = repeating_key_xor(bytes(plaintext5, 'ascii'), bytes(key, 'ascii'))
     print(res5)
     assert res5 == correct_answer
 
