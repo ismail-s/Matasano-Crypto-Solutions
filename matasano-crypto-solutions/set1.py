@@ -2,7 +2,7 @@ from base64 import b64encode, b64decode
 from binascii import hexlify, unhexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 from pathlib import Path
 import os
 import itertools
@@ -145,6 +145,10 @@ def normalised_hamming_distance(string1: bytes, string2: bytes):
     return hamming_distance(string1, string2) / len(string1)
 
 
+def split_into_groups(string: Iterable, size: int):
+    return [string[i:i + size] for i in range(0, len(string), size)]
+
+
 def decode_repeating_byte_xor(ciphertext: bytes):
     c = ciphertext
     edit_distances = defaultdict(list)
@@ -162,9 +166,8 @@ def decode_repeating_byte_xor(ciphertext: bytes):
     possible_keysizes = reduce(reducing_func, likely_keysizes, [])
     keys = []
     for keysize in possible_keysizes:
-        n = keysize
-        blocks = [ciphertext[i:i + n] for i in range(0, len(ciphertext), n)]
-        if len(blocks[-1]) != n:
+        blocks = split_into_groups(ciphertext, keysize)
+        if len(blocks[-1]) != keysize:
             del blocks[-1]
         transposed_blocks = zip(*blocks)
         key = []
@@ -192,6 +195,16 @@ def decode_aes_ecb(ciphertext, password):
     decryptor = cipher.decryptor()
     res = decryptor.update(ciphertext) + decryptor.finalize()
     return res.decode('ascii')
+
+
+def detect_aes_ecb_encrypted_texts(ciphertexts: List[bytes]):
+    max_repeats = defaultdict(list)
+    for text in ciphertexts:
+        counts = Counter(split_into_groups(text, 16))
+        most_no_of_repeats = counts.most_common(1)[0][1]
+        max_repeats[most_no_of_repeats].append(text)
+    most_repeats = max(max_repeats.keys())
+    return most_repeats, max_repeats[most_repeats]
 
 res1 = hex_to_base64(
     '49276d206b696c6c696e6720796f757220627261696e206c6'
@@ -251,3 +264,11 @@ password = b"YELLOW SUBMARINE"
 res7 = decode_aes_ecb(ciphertext7, password)
 assert res7.startswith("I'm back and I'm ringin' the bell ")
 print(res7)
+
+print('Task 8')
+ciphertexts8 = get_file('8.txt').split('\n')
+ciphertexts8 = [bytes.fromhex(x) for x in ciphertexts8 if x]
+res8 = detect_aes_ecb_encrypted_texts(ciphertexts8)
+assert len(res8[1]) == 1
+print('Most likely string:', hexlify(res8[1][0]).decode('ascii'))
+print('Max no. of repeats of a 16byte chunk found:', res8[0])
