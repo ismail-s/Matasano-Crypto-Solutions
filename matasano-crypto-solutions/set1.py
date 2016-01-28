@@ -7,9 +7,14 @@ from pathlib import Path
 import os
 import itertools
 from functools import reduce
-
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 
 current_dir = str(Path(__file__).parent)
+
+
+def get_file(relative_path: str):
+    return open(os.path.join(current_dir, relative_path), 'r').read()
 
 
 def get_most_common_from_counter(counter: Counter, n: int):
@@ -180,6 +185,14 @@ def decode_repeating_byte_xor(ciphertext: bytes):
     plaintext = find_english_text(plaintexts.keys())
     return plaintexts[plaintext], plaintext
 
+
+def decode_aes_ecb(ciphertext, password):
+    backend = default_backend()
+    cipher = Cipher(algorithms.AES(password), modes.ECB(), backend=backend)
+    decryptor = cipher.decryptor()
+    res = decryptor.update(ciphertext) + decryptor.finalize()
+    return res.decode('ascii')
+
 res1 = hex_to_base64(
     '49276d206b696c6c696e6720796f757220627261696e206c6'
     '96b65206120706f69736f6e6f7573206d757368726f6f6d')
@@ -203,7 +216,7 @@ print(res3[1])
 assert res3[1] == "Cooking MC's like a pound of bacon"
 
 print('Task 4')
-ciphertexts = open(os.path.join(current_dir, '4.txt'), 'r').read().split('\n')
+ciphertexts = get_file('4.txt').split('\n')
 res4 = find_and_decrypt_ciphertexts(ciphertexts)
 print('Key: {0}\nPlaintext: {1}'.format(*res4))
 assert res4[1] == 'Now that the party is jumping\n'
@@ -223,10 +236,18 @@ print('Task 6')
 string1 = b'this is a test'
 string2 = b'wokka wokka!!!'
 print('Hamming Distance Check:', hamming_distance(string1, string2))
-ciphertext6 = open(os.path.join(current_dir, '6.txt'), 'r').read()
+ciphertext6 = get_file('6.txt')
 ciphertext6 = b64decode(ciphertext6)
 res6 = decode_repeating_byte_xor(ciphertext6)
 assert res6[0] == 'Terminator X: Bring the noise'
 print('Key:', res6[0])
 print('Plaintext:')
 print(res6[1])
+
+print('Task 7')
+ciphertext7 = get_file('7.txt')
+ciphertext7 = b64decode(ciphertext7)
+password = b"YELLOW SUBMARINE"
+res7 = decode_aes_ecb(ciphertext7, password)
+assert res7.startswith("I'm back and I'm ringin' the bell ")
+print(res7)
