@@ -16,7 +16,7 @@ def pad_with_pkcs7(message: bytes, block_length: int) -> bytes:
     return res
 
 
-def aes_cbc_decode(ciphertext, password, iv):
+def aes_cbc_decode(ciphertext: bytes, password: bytes, iv: bytes) -> bytes:
     blocks = split_into_groups(ciphertext, 16)
     res = []
     # Sort out the first block on its own, as it requires iv
@@ -27,7 +27,7 @@ def aes_cbc_decode(ciphertext, password, iv):
     return b''.join(res)
 
 
-def aes_cbc_encode(plaintext, password, iv):
+def aes_cbc_encode(plaintext: bytes, password: bytes, iv: bytes) -> bytes:
     blocks = split_into_groups(plaintext, 16)
     res = []
     prev_block = iv
@@ -47,8 +47,7 @@ print('Challenge 10')
 ciphertext10 = base64_to_bytes(get_file('10.txt'))
 password10 = b'YELLOW SUBMARINE'
 iv = b'\x00' * 16
-res10 = aes_cbc_decode(ciphertext10, password10, iv)
-res10 = res10.decode('ascii')
+res10 = aes_cbc_decode(ciphertext10, password10, iv).decode('ascii')
 assert res10.startswith("I'm back and I'm ringin' the bell")
 print(res10)
 # Check that encrypting is the opposite of decrypting
