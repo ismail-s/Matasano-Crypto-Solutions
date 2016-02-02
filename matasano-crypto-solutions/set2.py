@@ -1,6 +1,7 @@
 from utils import (
     base64_to_bytes,
     aes_ecb_decode,
+    aes_ecb_encode,
     get_file,
     split_into_groups,
     xor)
@@ -26,6 +27,16 @@ def aes_cbc_decode(ciphertext, password, iv):
     return b''.join(res)
 
 
+def aes_cbc_encode(plaintext, password, iv):
+    blocks = split_into_groups(plaintext, 16)
+    res = []
+    prev_block = iv
+    for block in blocks:
+        prev_block = aes_ecb_encode(xor(prev_block, block), password)
+        res.append(prev_block)
+    return b''.join(res)
+
+
 print('Set 2')
 print('Challenge 9')
 res9 = pad_with_pkcs7(b'YELLOW SUBMARINE', 20)
@@ -34,7 +45,12 @@ print(res9)
 
 print('Challenge 10')
 ciphertext10 = base64_to_bytes(get_file('10.txt'))
-res10 = aes_cbc_decode(ciphertext10, b'YELLOW SUBMARINE', b'\x00' * 16)
+password10 = b'YELLOW SUBMARINE'
+iv = b'\x00' * 16
+res10 = aes_cbc_decode(ciphertext10, password10, iv)
 res10 = res10.decode('ascii')
 assert res10.startswith("I'm back and I'm ringin' the bell")
 print(res10)
+# Check that encrypting is the opposite of decrypting
+test_ciphertext10 = aes_cbc_encode(res10.encode('ascii'), password10, iv)
+assert test_ciphertext10 == ciphertext10

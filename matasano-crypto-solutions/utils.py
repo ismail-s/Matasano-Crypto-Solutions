@@ -33,6 +33,14 @@ def aes_ecb_decode(ciphertext, password):
     return res
 
 
+def aes_ecb_encode(plaintext, password):
+    backend = default_backend()
+    cipher = Cipher(algorithms.AES(password), modes.ECB(), backend=backend)
+    encryptor = cipher.encryptor()
+    res = encryptor.update(plaintext) + encryptor.finalize()
+    return res
+
+
 def xor(x: bytes, y: bytes) -> bytes:
     return bytes((a ^ b for a, b in zip(x, y)))
 
