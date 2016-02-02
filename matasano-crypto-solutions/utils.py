@@ -3,6 +3,7 @@ from binascii import hexlify
 from pathlib import Path
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from typing import Sequence
 import os
 
 
@@ -34,3 +35,7 @@ def decode_aes_ecb(ciphertext, password):
 
 def xor(x: bytes, y: bytes) -> bytes:
     return bytes((a ^ b for a, b in zip(x, y)))
+
+
+def split_into_groups(string: Sequence, size: int):
+    return [string[i:i + size] for i in range(0, len(string), size)]

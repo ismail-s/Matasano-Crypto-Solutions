@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 from string import ascii_letters
-from typing import Dict, Iterable, List, Sequence, Tuple, Any
+from typing import Dict, Iterable, List, Tuple, Any
 import itertools
 from functools import reduce
 from utils import (
@@ -11,7 +11,8 @@ from utils import (
     text_to_bytes,
     get_file,
     decode_aes_ecb,
-    xor)
+    xor,
+    split_into_groups)
 
 
 def get_most_common_from_counter(counter: Counter, n: int):
@@ -134,10 +135,6 @@ def hamming_distance(string1: bytes, string2: bytes) -> int:
 def normalised_hamming_distance(string1: bytes, string2: bytes):
     assert len(string1) == len(string2)
     return hamming_distance(string1, string2) / len(string1)
-
-
-def split_into_groups(string: Sequence, size: int):
-    return [string[i:i + size] for i in range(0, len(string), size)]
 
 
 def decode_repeating_byte_xor(ciphertext: bytes):
