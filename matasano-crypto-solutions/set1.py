@@ -1,31 +1,17 @@
-from base64 import b64encode, b64decode
-from binascii import hexlify
 from collections import Counter, defaultdict
 from string import ascii_letters
 from typing import Dict, Iterable, List, Sequence, Tuple, Any
-from pathlib import Path
-import os
 import itertools
 from functools import reduce
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-
-current_dir = str(Path(__file__).parent)
-hex_to_bytes = bytes.fromhex
-
-
-def bytes_to_hex(x: bytes) -> str:
-    return hexlify(x).decode('ascii')
-base64_to_bytes = b64decode
-bytes_to_base64 = b64encode
-
-
-def text_to_bytes(text: str) -> bytes:
-    return bytes(text, 'ascii')
-
-
-def get_file(relative_path: str):
-    return open(os.path.join(current_dir, relative_path), 'r').read()
+from utils import (
+    hex_to_bytes,
+    bytes_to_hex,
+    base64_to_bytes,
+    bytes_to_base64,
+    text_to_bytes,
+    get_file,
+    decode_aes_ecb,
+    xor)
 
 
 def get_most_common_from_counter(counter: Counter, n: int):
@@ -65,10 +51,6 @@ def get_most_common_from_counter(counter: Counter, n: int):
 
 def hex_to_base64(bstr: str):
     return bytes_to_base64(hex_to_bytes(bstr))
-
-
-def xor(x: bytes, y: bytes) -> bytes:
-    return bytes((a ^ b for a, b in zip(x, y)))
 
 
 def repeating_key_xor(string: bytes, key: bytes) -> bytes:
@@ -192,14 +174,6 @@ def decode_repeating_byte_xor(ciphertext: bytes):
                 ciphertext, bytes(key, 'ascii')).decode('ascii')] = key
     plaintext = find_english_text(plaintexts.keys())
     return plaintexts[plaintext], plaintext
-
-
-def decode_aes_ecb(ciphertext, password):
-    backend = default_backend()
-    cipher = Cipher(algorithms.AES(password), modes.ECB(), backend=backend)
-    decryptor = cipher.decryptor()
-    res = decryptor.update(ciphertext) + decryptor.finalize()
-    return res.decode('ascii')
 
 
 def detect_aes_ecb_encrypted_texts(ciphertexts: List[bytes]):
