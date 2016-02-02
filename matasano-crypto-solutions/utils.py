@@ -30,7 +30,7 @@ def decode_aes_ecb(ciphertext, password):
     cipher = Cipher(algorithms.AES(password), modes.ECB(), backend=backend)
     decryptor = cipher.decryptor()
     res = decryptor.update(ciphertext) + decryptor.finalize()
-    return res.decode('ascii')
+    return res
 
 
 def xor(x: bytes, y: bytes) -> bytes:

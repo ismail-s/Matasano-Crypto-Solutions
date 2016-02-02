@@ -240,7 +240,7 @@ def main():
     ciphertext7 = get_file('7.txt')
     ciphertext7 = base64_to_bytes(ciphertext7)
     password = b"YELLOW SUBMARINE"
-    res7 = decode_aes_ecb(ciphertext7, password)
+    res7 = decode_aes_ecb(ciphertext7, password).decode('ascii')
     assert res7.startswith("I'm back and I'm ringin' the bell ")
     print(res7)
 
