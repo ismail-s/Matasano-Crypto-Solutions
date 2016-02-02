@@ -25,7 +25,7 @@ def get_file(relative_path: str):
     return open(os.path.join(current_dir, relative_path), 'r').read()
 
 
-def decode_aes_ecb(ciphertext, password):
+def aes_ecb_decode(ciphertext, password):
     backend = default_backend()
     cipher = Cipher(algorithms.AES(password), modes.ECB(), backend=backend)
     decryptor = cipher.decryptor()
