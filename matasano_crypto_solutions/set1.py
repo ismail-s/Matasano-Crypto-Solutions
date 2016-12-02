@@ -3,7 +3,7 @@ from string import ascii_letters
 from typing import Dict, Iterable, List, Tuple, Any
 import itertools
 from functools import reduce
-from utils import (
+from matasano_crypto_solutions.utils import (
     hex_to_bytes,
     bytes_to_hex,
     base64_to_bytes,
