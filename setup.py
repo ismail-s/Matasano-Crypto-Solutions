@@ -11,5 +11,7 @@ setuptools.setup(name='matasano-crypto-solutions',
                  url='https://github.com/ismail-s/Matasano-Crypto-Solutions',
                  py_modules=['matasano_crypto_solutions'],
                  install_requires=open('requirements.txt').read().split(),
+                 setup_requires=['pytest-runner'],
+                 tests_require=['pytest'],
                  license='MIT License',
                  zip_safe=True)
