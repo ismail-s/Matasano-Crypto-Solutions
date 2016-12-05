@@ -1,6 +1,9 @@
 machine:
   python:
     version: 3.5.2
+dependencies:
+  override:
+    - pip3 install --upgrade pip
 test:
   override:
     - sudo python3 setup.py test
