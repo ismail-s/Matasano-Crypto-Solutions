@@ -6,4 +6,4 @@ dependencies:
     - pip3 install --upgrade pip setuptools
 test:
   override:
-    - sudo python3 setup.py test
+    - python3 setup.py test
