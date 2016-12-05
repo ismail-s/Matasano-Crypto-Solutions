@@ -13,6 +13,8 @@ hex_to_bytes = bytes.fromhex
 
 def bytes_to_hex(x: bytes) -> str:
     return hexlify(x).decode('ascii')
+
+
 base64_to_bytes = b64decode
 bytes_to_base64 = b64encode
 

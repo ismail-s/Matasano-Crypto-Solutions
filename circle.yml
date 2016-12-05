@@ -1,0 +1,13 @@
+machine:
+  python:
+    version: 3.5.2
+dependencies:
+  override:
+    - pip3 install --upgrade pip setuptools
+    - python3 setup.py test --addopts --collect-only
+    - mkdir -p $CIRCLE_TEST_REPORTS/pytest
+  cache_directories:
+    - .eggs
+test:
+  override:
+    - python3 setup.py test --addopts --junitxml=$CIRCLE_TEST_REPORTS/pytest/junit.xml
