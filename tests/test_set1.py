@@ -1,4 +1,5 @@
-from matasano_crypto_solutions.set1 import *
+from matasano_crypto_solutions.set1 import *  # noqa: F403
+
 
 def test_task_1():
     res1 = hex_to_base64(
@@ -7,11 +8,13 @@ def test_task_1():
     assert res1 == (b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc'
                     b'29ub3VzIG11c2hyb29t')
 
+
 def test_task_2():
     x = hex_to_bytes('1c0111001f010100061a024b53535009181c')
     y = hex_to_bytes('686974207468652062756c6c277320657965')
     res2 = bytes_to_hex(xor(x, y))
     assert res2 == '746865206b696420646f6e277420706c6179'
+
 
 def test_task_3():
     ciphertext = hex_to_bytes('1b37373331363f78151b7f2b783431333d78397828372d'
@@ -19,10 +22,12 @@ def test_task_3():
     res3 = decode_1_byte_xor(ciphertext)
     assert res3[1] == "Cooking MC's like a pound of bacon"
 
+
 def test_task_4():
     ciphertexts = get_file('4.txt').split('\n')
     res4 = find_and_decrypt_ciphertexts(ciphertexts)
     assert res4[1] == 'Now that the party is jumping\n'
+
 
 def test_task_5():
     plaintext5 = ("Burning 'em, if you ain't quick and nimble\n"
@@ -35,6 +40,7 @@ def test_task_5():
                                           text_to_bytes(key)))
     assert res5 == correct_answer
 
+
 def test_task_6():
     string1 = b'this is a test'
     string2 = b'wokka wokka!!!'
@@ -45,6 +51,7 @@ def test_task_6():
     res6 = decode_repeating_byte_xor(ciphertext6)
     assert res6[0] == 'Terminator X: Bring the noise'
 
+
 def test_task_7():
     ciphertext7 = get_file('7.txt')
     ciphertext7 = base64_to_bytes(ciphertext7)
@@ -52,13 +59,15 @@ def test_task_7():
     res7 = aes_ecb_decode(ciphertext7, password).decode('ascii')
     assert res7.startswith("I'm back and I'm ringin' the bell ")
 
+
 def test_task_8():
     ciphertexts8 = get_file('8.txt').split('\n')
     ciphertexts8 = [bytes.fromhex(x) for x in ciphertexts8 if x]
     res8 = detect_aes_ecb_encrypted_texts(ciphertexts8)
     assert len(res8[1]) == 1
     most_likely_string = bytes_to_hex(res8[1][0])
-    assert most_likely_string == ('d880619740a8a19b7840a8a31c810a3d08649af' +
+    assert most_likely_string == (
+        'd880619740a8a19b7840a8a31c810a3d08649af' +
         '70dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb5708649af7' +
         '0dc06f4fd5d2d69c744cd2839475c9dfdbc1d46597949d9c7e82bf5a08649af70' +
         'dc06f4fd5d2d69c744cd28397a93eab8d6aecd566489154789a6b0308649af70d' +

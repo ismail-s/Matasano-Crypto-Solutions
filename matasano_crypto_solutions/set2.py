@@ -1,4 +1,5 @@
-import os, random
+import os
+import random
 from collections import Counter
 from matasano_crypto_solutions.utils import (
     base64_to_bytes,

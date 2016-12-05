@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 from string import ascii_letters
-from typing import Dict, Iterable, List, Tuple, Any
+from typing import Dict, Iterable, List, Tuple, Any  # noqa: F401
 import itertools
 from functools import reduce
 from matasano_crypto_solutions.utils import (
