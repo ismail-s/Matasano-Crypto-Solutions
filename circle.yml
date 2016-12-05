@@ -4,6 +4,9 @@ machine:
 dependencies:
   override:
     - pip3 install --upgrade pip setuptools
+    - python3 setup.py test --addopts --collect-only
+  cache_directories:
+    - .eggs
 test:
   override:
     - python3 setup.py test
