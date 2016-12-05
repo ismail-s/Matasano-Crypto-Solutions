@@ -3,7 +3,7 @@ machine:
     version: 3.5.2
 dependencies:
   override:
-    - pip3 install --upgrade pip
+    - pip3 install --upgrade pip setuptools
 test:
   override:
     - sudo python3 setup.py test
